@@ -3,6 +3,7 @@ package com.example.jpa_test.user.RepositoryTest;
 import com.example.jpa_test.repository.UserRepository;
 import com.example.jpa_test.user.domain.User;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,73 +12,70 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-//@SpringBootTest 스프링을 직접 실행해서 테스트 함
+
+//@SpringBootTest // 스프링을 직접 실행해서 테스트 함
 @DataJpaTest
 class UserRepositoryTest {
     @Autowired
     private UserRepository userRepository;
+    String email = "email1";
+    String password = "pass";
+    String username = "user";
+    @BeforeEach
+    void setUp(){
+        User user = User.builder().email(email).password(password).username(username).build();
+        userRepository.save(user);
+    }
+
 
     @Test
     @DisplayName("빌더_테스트")
-    void buildTest(){
+    void builderTest(){
         User user = User.builder()
-                .email("asdf")
-                .password("asdf")
+                .email("fdsafd")
+                .password("dsa")
                 .username("fff")
-                .stores(new ArrayList<>())
                 .build();
-        Assertions.assertEquals(new ArrayList<>(), user.getStores());
-        assertEquals("asdf123", user.getEmail());
+        assertEquals(new ArrayList<>(), user.getStores());
+        assertEquals("fdsafd", user.getEmail());
     }
     @Test
+    @Transactional
     void saveTest(){
         // given 이러한 값이 주어지고
-        String email = "email";
-        String password = "pass";
-        String username = "user";
+        String email = "email22";
+        User user = User.builder().email(email).password(password).username(username).build();
 
-        User user = User.builder()
-                .email(email)
-                .password(password)
-                .username(username)
-                .build();
-        // when 이걸 실행하면
-        userRepository.save(user); //id가 자동으로 생성된다!!
-        // then 그 후 이렇게 매칭되었다.
+        // when 이거 실행했는데
+        userRepository.save(user);
+
+        // then 그 후 이런 값이랑 매칭이 되었다.
         assertEquals(email, user.getEmail());
         assertNotNull(user.getId());
     }
     @Test
     void 다섯개를_저장후_전부가_다섯개가_맞음을_테스트(){
-        String email = "email";
-        String password = "pass";
-        String username = "user";
-
-        for(int i=0;i<5;i++){
+        for (int i = 0; i < 4; i++) {
             User user = User.builder()
-                    .email(email+i)
-                    .password(password)
-                    .username(username)
-                    .build();
+                    .email(email+i).password(password).username(username).build();
             userRepository.save(user);
         }
-        assertEquals(5, userRepository.count());
+
+        List<User> all = userRepository.findAll();
+
+        assertEquals(5, all.size());
+        assertEquals(email+3, all.get(4).getEmail());
     }
     @Test
     void 이메일_email로_저장후_이메일로_찾아오는_테스트(){
-        String email = "emails";
-        String password = "pass";
-        String username = "user";
-        User user = User.builder()
-                .email(email)
-                .password(password)
-                .username(username)
-                .build();
-        userRepository.save(user);
+        // given 이러한 값이 주어지고
+
+
         Optional<User> byEmail = userRepository.findByEmail(email);
 
         assertTrue(byEmail.isPresent());
