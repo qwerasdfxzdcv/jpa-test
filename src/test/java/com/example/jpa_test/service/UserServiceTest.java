@@ -4,6 +4,7 @@ import com.example.jpa_test.repository.UserRepository;
 import com.example.jpa_test.request.UserRequest;
 import com.example.jpa_test.response.UserResponse;
 import com.example.jpa_test.user.domain.User;
+import org.apache.coyote.Request;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -23,24 +24,41 @@ class UserServiceTest {
     @Autowired
     private UserRepository userRepository;
 
-    @Test
-    void createUser() {
-        // given
-        // when
-        // then
-    }
-
-    @Test
-    void updateUser() {
-    }
-
-    @Test
-    void deleteUserById() {
-    }
-
     //Nested -> 테스트를 묶어서 한번에! 각 테스트마다 이름을 붙혀주면 한눈에 보기 더 편함
     @Nested
-    class GetUserById {
+    class testAll {
+
+        @Test
+        void createUser() {
+            UserRequest request = new UserRequest("pppp","oooo","iiii");
+            // given
+            userService.createUser(request);
+            // when
+            assertEquals(11, userRepository.count());
+            // then
+        }
+
+        @Test
+        void updateUser() {
+            User user = users.get(0);
+            UserRequest request = new UserRequest(user.getEmail(),
+                    user.getPassword()+"1231",
+                    user.getUsername());
+            UserResponse response = userService.updateUser(user.getId(),request);
+
+            assertNotNull(response);
+            User after = userRepository.findById(user.getId()).get();
+            assertEquals(request.password(), after.getPassword());
+            assertEquals(request.username(), after.getUsername());
+            assertEquals(request.email(), after.getEmail());
+        }
+
+        @Test
+        @DisplayName("삭제성공")
+        void deleteUserById() {
+            userService.deleteUserById(1L);
+            assertFalse(userRepository.findById(1L).isPresent());
+        }
 
         @Test
         @DisplayName("성공")

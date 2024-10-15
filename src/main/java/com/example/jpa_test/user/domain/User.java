@@ -1,11 +1,10 @@
 package com.example.jpa_test.user.domain;
 
+import ch.qos.logback.core.util.StringUtil;
+import com.example.jpa_test.request.UserRequest;
 import com.example.jpa_test.store.domain.Store;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,4 +34,10 @@ public class User {
     private String username;
     @OneToMany (mappedBy = "user")
     private List<Store> stores = new ArrayList<>();
+    public void update(UserRequest request){
+        if(!StringUtil.isNullOrEmpty(request.password()))
+            this.password = request.password();
+        if(!StringUtil.isNullOrEmpty(request.username()))
+            this.username = request.username();
+    }
 }
