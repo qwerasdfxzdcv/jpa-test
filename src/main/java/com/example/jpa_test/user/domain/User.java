@@ -3,12 +3,15 @@ package com.example.jpa_test.user.domain;
 import com.example.jpa_test.store.domain.Store;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@Builder
 @Table(
         name = "USERS",
         indexes = {
@@ -30,6 +33,6 @@ public class User {
     private String password;
     @Column(length = 10, nullable = false)
     private String username;
-    @OneToMany(mappedBy = "user")
-    private List<Store> stores;
+    @OneToMany (mappedBy = "user")
+    private List<Store> stores = new ArrayList<>();
 }
